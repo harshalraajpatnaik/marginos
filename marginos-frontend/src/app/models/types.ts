@@ -53,18 +53,34 @@ export interface RegisterRequest {
 }
 
 export interface DashboardSummary {
+  businessName?: string;
+  operatingMode?: OperatingMode;
   cashInHand: number;
   bankBalance: number;
+  totalCashAvailable?: number;
   todaySales: number;
-  mtdSales: number;
-  grossMarginPercent: number;
-  netProfit: number;
-  netMarginPercent: number;
-  cashConversionCycleDays: number;
-  totalReceivables: number;
-  totalPayables: number;
-  stockValuation: number;
+  monthToDateSales?: number;
+  monthToDateGrossProfit?: number;
+  monthToDateGrossMarginPercent?: number;
+  monthToDateExpenses?: number;
+  monthToDateNetProfit?: number;
+  pendingReceivables?: number;
+  pendingPayables?: number;
+  netReceivablePayableGap?: number;
+  totalInventoryValuation?: number;
   lowStockCount: number;
+  totalSkus?: number;
+  recentSalesTrend?: { date: string; amount: number }[];
+  topExpenses?: any[];
+  // Fallback aliases
+  mtdSales?: number;
+  grossMarginPercent?: number;
+  netProfit?: number;
+  netMarginPercent?: number;
+  cashConversionCycleDays?: number;
+  totalReceivables?: number;
+  totalPayables?: number;
+  stockValuation?: number;
 }
 
 export interface CashbookEntry {
