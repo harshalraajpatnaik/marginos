@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: marginos-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-marginos}
+      POSTGRES_USER: ${POSTGRES_USER:-marginos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marginos_secure_password_dev}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5435}:5432"
+    volumes:
+      - marginos_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-marginos} -d ${POSTGRES_DB:-marginos}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: marginos-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAIL_PORT:-1026}:1025"
+      - "8026:8025"
+
+volumes:
+  marginos_pg_data:
+    name: marginos_pg_data

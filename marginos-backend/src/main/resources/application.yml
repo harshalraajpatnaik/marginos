@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: marginos-backend
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
+    show-sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+server:
+  port: ${PORT:8085}
+  error:
+    include-message: always
+    include-binding-errors: always
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:4f8b9c2a1e6d7f0a8b9c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a}
+    access-token-expiration-seconds: ${JWT_ACCESS_EXPIRY_SECONDS:900} # 15 minutes
+    refresh-token-expiration-seconds: ${JWT_REFRESH_EXPIRY_SECONDS:604800} # 7 days
+  frontend-url: ${FRONTEND_URL:http://localhost:4200}
+  ai:
+    enabled: ${AI_ENABLED:false}
+    provider: ${AI_PROVIDER:lm-studio}
+    base-url: ${AI_BASE_URL:http://localhost:1234/v1}
+    model: ${AI_MODEL:local-model}
+    timeout-seconds: ${AI_TIMEOUT_SECONDS:30}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
