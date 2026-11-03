@@ -3,6 +3,9 @@ import { AppLayoutComponent } from './layout/app-layout.component';
 import { LandingComponent } from './pages/landing/landing.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { TermsComponent } from './pages/terms/terms.component';
+import { PrivacyComponent } from './pages/privacy/privacy.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CashbookComponent } from './pages/cashbook/cashbook.component';
 import { SalesComponent } from './pages/sales/sales.component';
@@ -29,6 +32,9 @@ export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'terms', component: TermsComponent },
+  { path: 'privacy', component: PrivacyComponent },
 
   // Authenticated App Shell
   {
