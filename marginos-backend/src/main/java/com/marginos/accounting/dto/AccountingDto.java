@@ -214,8 +214,13 @@ public class AccountingDto {
         private LocalDate startDate;
         private LocalDate endDate;
         private BigDecimal netIncome;
+        private BigDecimal operatingInflow;
+        private BigDecimal operatingOutflow;
+        private BigDecimal netOperatingCash;
         private BigDecimal operatingCashFlow;
         private BigDecimal investingCashFlow;
+        private BigDecimal financingInflow;
+        private BigDecimal financingOutflow;
         private BigDecimal financingCashFlow;
         private BigDecimal netCashChange;
         private BigDecimal openingCash;

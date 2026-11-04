@@ -53,7 +53,9 @@ public class InventoryDto {
     @AllArgsConstructor
     public static class InventoryValuationResponse {
         private BigDecimal totalStockValue;
+        private BigDecimal totalValuation;
         private int totalSkus;
+        private int totalItemCount;
         private int lowStockCount;
         private List<ProductValuationItem> items;
     }

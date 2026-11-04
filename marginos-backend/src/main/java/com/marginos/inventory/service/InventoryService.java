@@ -149,7 +149,9 @@ public class InventoryService {
 
         return InventoryValuationResponse.builder()
                 .totalStockValue(totalValuation)
+                .totalValuation(totalValuation)
                 .totalSkus(products.size())
+                .totalItemCount(products.size())
                 .lowStockCount(lowStockCount)
                 .items(items)
                 .build();

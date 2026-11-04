@@ -58,7 +58,7 @@ import { InventoryValuation, AbcAnalysisItem, SlowMovingItem, StockMovement, Pro
           <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
             <span class="text-xs font-bold text-slate-500 block uppercase">Total Inventory Valuation</span>
             <span class="text-2xl font-black text-slate-900 mt-1 block">
-              ₹{{ valuation?.totalValuation | number:'1.2-2' }}
+              ₹{{ (valuation?.totalStockValue || valuation?.totalValuation || getTotalStockValue()) | number:'1.2-2' }}
             </span>
             <span class="text-[10px] text-slate-400 mt-1 block">Basis: Weighted-Average Unit Cost (WAVG)</span>
           </div>
@@ -66,7 +66,7 @@ import { InventoryValuation, AbcAnalysisItem, SlowMovingItem, StockMovement, Pro
           <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
             <span class="text-xs font-bold text-slate-500 block uppercase">Active Product Lines</span>
             <span class="text-2xl font-black text-indigo-600 mt-1 block">
-              {{ valuation?.totalItemCount || products.length }} SKUs
+              {{ (valuation?.totalSkus || valuation?.totalItemCount || products.length) }} SKUs
             </span>
             <span class="text-[10px] text-slate-400 mt-1 block">Tracked in physical stock</span>
           </div>
@@ -346,6 +346,13 @@ export class InventoryComponent implements OnInit {
         category: cat
       };
     });
+  }
+
+  getTotalStockValue(): number {
+    if (this.valuation && (this.valuation.totalStockValue || this.valuation.totalValuation)) {
+      return this.valuation.totalStockValue || this.valuation.totalValuation || 0;
+    }
+    return this.products.reduce((sum, p) => sum + ((p.currentStock || 0) * (p.costPrice || 0)), 0);
   }
 
   runEoq(): void {

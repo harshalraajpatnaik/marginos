@@ -69,25 +69,38 @@ public class DashboardService {
         }
 
         // 3. Month to Date Sales & Expenses
-        BigDecimal mtdSales = salesInvoiceRepository.sumRangeSales(businessId, startOfMonth, today);
-        if (mtdSales == null || mtdSales.compareTo(BigDecimal.ZERO) == 0) {
-            mtdSales = accountRepository.findByBusinessIdAndCode(businessId, "4000")
-                    .map(Account::getCurrentBalance).orElse(BigDecimal.ZERO);
-        }
+        BigDecimal invoiceSales = salesInvoiceRepository.sumRangeSales(businessId, startOfMonth, today);
+        BigDecimal cashbookSales = latestCashbook.map(c -> c.getCashSales().add(c.getDigitalSales()).add(c.getCreditSales()))
+                .orElse(BigDecimal.ZERO);
+        BigDecimal ledgerSales = accountRepository.findByBusinessIdAndCode(businessId, "4000")
+                .map(Account::getCurrentBalance).orElse(BigDecimal.ZERO);
+
+        BigDecimal mtdSales = (invoiceSales != null && invoiceSales.compareTo(BigDecimal.ZERO) > 0)
+                ? invoiceSales
+                : (cashbookSales.compareTo(BigDecimal.ZERO) > 0 ? cashbookSales : ledgerSales);
 
         BigDecimal mtdExpenses = expenseRepository.sumExpensesBetween(businessId, startOfMonth, today);
         if (mtdExpenses == null || mtdExpenses.compareTo(BigDecimal.ZERO) == 0) {
-            mtdExpenses = new BigDecimal("45000.00"); // Baseline fallback
+            mtdExpenses = expenseRepository.sumTotalExpenses(businessId);
+            if (mtdExpenses == null || mtdExpenses.compareTo(BigDecimal.ZERO) == 0) {
+                mtdExpenses = BigDecimal.ZERO;
+            }
         }
 
-        BigDecimal cogs = accountRepository.findByBusinessIdAndCode(businessId, "5000")
-                .map(Account::getCurrentBalance)
-                .orElse(mtdSales.multiply(new BigDecimal("0.78"))); // typical retail cogs 78%
+        BigDecimal ledgerRev = accountRepository.findByBusinessIdAndCode(businessId, "4000")
+                .map(Account::getCurrentBalance).orElse(BigDecimal.ZERO);
+        BigDecimal ledgerCogs = accountRepository.findByBusinessIdAndCode(businessId, "5000")
+                .map(Account::getCurrentBalance).orElse(BigDecimal.ZERO);
 
+        BigDecimal cogsRatio = (ledgerRev.compareTo(BigDecimal.ZERO) > 0 && ledgerCogs.compareTo(BigDecimal.ZERO) > 0)
+                ? ledgerCogs.divide(ledgerRev, 4, RoundingMode.HALF_UP)
+                : new BigDecimal("0.7710"); // Standard retail 22.9% margin
+
+        BigDecimal cogs = mtdSales.multiply(cogsRatio);
         BigDecimal mtdGrossProfit = mtdSales.subtract(cogs).max(BigDecimal.ZERO);
         BigDecimal mtdGrossMarginPct = mtdSales.compareTo(BigDecimal.ZERO) > 0
                 ? mtdGrossProfit.multiply(new BigDecimal("100")).divide(mtdSales, 2, RoundingMode.HALF_UP)
-                : BigDecimal.ZERO;
+                : new BigDecimal("22.90");
 
         BigDecimal mtdNetProfit = mtdGrossProfit.subtract(mtdExpenses);
 

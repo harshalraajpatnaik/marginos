@@ -407,9 +407,18 @@ public class AccountingService {
         BigDecimal bankBal = bankOpt.map(Account::getCurrentBalance).orElse(BigDecimal.ZERO);
         BigDecimal closingCash = cashBal.add(bankBal);
 
-        BigDecimal operatingCashFlow = pnl.getNetProfit(); // Simplified direct cash view
+        BigDecimal operatingInflow = pnl.getSalesRevenue() != null ? pnl.getSalesRevenue() : BigDecimal.ZERO;
+        BigDecimal cogs = pnl.getCostOfGoodsSold() != null ? pnl.getCostOfGoodsSold() : BigDecimal.ZERO;
+        BigDecimal opex = pnl.getTotalOperatingExpenses() != null ? pnl.getTotalOperatingExpenses() : BigDecimal.ZERO;
+        BigDecimal operatingOutflow = cogs.add(opex);
+        BigDecimal netOperatingCash = operatingInflow.subtract(operatingOutflow);
+        BigDecimal operatingCashFlow = pnl.getNetProfit() != null ? pnl.getNetProfit() : netOperatingCash;
+
         BigDecimal investingCashFlow = BigDecimal.ZERO;
-        BigDecimal financingCashFlow = BigDecimal.ZERO;
+        BigDecimal financingInflow = BigDecimal.ZERO;
+        BigDecimal financingOutflow = pnl.getInterestExpense() != null ? pnl.getInterestExpense() : BigDecimal.ZERO;
+        BigDecimal financingCashFlow = financingInflow.subtract(financingOutflow);
+
         BigDecimal netChange = operatingCashFlow.add(investingCashFlow).add(financingCashFlow);
         BigDecimal openingCash = closingCash.subtract(netChange);
 
@@ -417,8 +426,13 @@ public class AccountingService {
                 .startDate(startDate)
                 .endDate(endDate)
                 .netIncome(pnl.getNetProfit())
+                .operatingInflow(operatingInflow)
+                .operatingOutflow(operatingOutflow)
+                .netOperatingCash(netOperatingCash)
                 .operatingCashFlow(operatingCashFlow)
                 .investingCashFlow(investingCashFlow)
+                .financingInflow(financingInflow)
+                .financingOutflow(financingOutflow)
                 .financingCashFlow(financingCashFlow)
                 .netCashChange(netChange)
                 .openingCash(openingCash)

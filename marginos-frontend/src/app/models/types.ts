@@ -134,7 +134,11 @@ export interface StockMovement {
 
 export interface InventoryValuation {
   totalValuation: number;
+  totalStockValue?: number;
   totalItemCount: number;
+  totalSkus?: number;
+  lowStockCount?: number;
+  items?: any[];
 }
 
 export interface AbcAnalysisItem {
@@ -268,6 +272,8 @@ export interface Account {
   code: string;
   name: string;
   category: string;
+  accountType?: string;
+  subCategory?: string;
   normalBalance: string;
   currentBalance: number;
 }
@@ -277,18 +283,27 @@ export interface JournalLine {
   accountId: string;
   accountCode?: string;
   accountName?: string;
-  debit: number;
-  credit: number;
+  accountType?: string;
+  debitAmount?: number;
+  creditAmount?: number;
+  debit?: number;
+  credit?: number;
   memo?: string;
+  description?: string;
 }
 
 export interface JournalEntry {
   id: string;
   entryNumber: string;
   entryDate: string;
+  postingDate?: string;
   description: string;
+  referenceNo?: string;
   referenceNumber?: string;
-  totalAmount: number;
+  sourceType?: string;
+  totalDebit?: number;
+  totalCredit?: number;
+  totalAmount?: number;
   status: string;
   lines: JournalLine[];
 }
@@ -343,12 +358,18 @@ export interface BalanceSheet {
 export interface CashFlowStatement {
   startDate: string;
   endDate: string;
+  netIncome?: number;
   operatingInflow: number;
   operatingOutflow: number;
   netOperatingCash: number;
+  operatingCashFlow?: number;
+  investingCashFlow?: number;
   financingInflow: number;
   financingOutflow: number;
+  financingCashFlow?: number;
   netCashChange: number;
+  openingCash?: number;
+  closingCash?: number;
 }
 
 export interface PricingCalculationResult {

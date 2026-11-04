@@ -26,7 +26,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
     private final BusinessService businessService;
 
-    @GetMapping
+    @GetMapping({"", "/summary"})
     @Operation(summary = "Get aggregated business dashboard metrics and KPIs")
     public ResponseEntity<ApiResponse<BusinessDashboardSummary>> getDashboardSummary(
             @AuthenticationPrincipal UserPrincipal principal,
