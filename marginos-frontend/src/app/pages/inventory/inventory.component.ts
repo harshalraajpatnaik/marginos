@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { InventoryValuation, AbcAnalysisItem, SlowMovingItem, StockMovement, Product, EoqResult } from '../../models/types';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="space-y-6">
       <!-- Header -->
@@ -22,7 +23,16 @@ import { InventoryValuation, AbcAnalysisItem, SlowMovingItem, StockMovement, Pro
           </p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <a routerLink="/products" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+            <span>📦</span>
+            <span>+ Add Product</span>
+          </a>
+          <a routerLink="/purchases" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+            <span>📥</span>
+            <span>+ Stock Intake</span>
+          </a>
+          <div class="h-4 w-px bg-slate-200 mx-1 hidden sm:block"></div>
           <button (click)="activeTab = 'VALUATION'" [class.bg-indigo-600]="activeTab === 'VALUATION'" [class.text-white]="activeTab === 'VALUATION'"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 transition">
             Valuation

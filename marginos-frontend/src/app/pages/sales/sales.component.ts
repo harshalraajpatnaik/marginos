@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Product, Customer, SalesInvoice, SalesInvoiceRequest, SalesInvoiceLineRequest } from '../../models/types';
 
 @Component({
   selector: 'app-sales',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="space-y-6">
       <!-- Header -->
@@ -22,7 +23,15 @@ import { Product, Customer, SalesInvoice, SalesInvoiceRequest, SalesInvoiceLineR
           </p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <a routerLink="/products" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+            <span>📦</span>
+            <span>Product Catalog</span>
+          </a>
+          <a routerLink="/customers" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+            <span>👥</span>
+            <span>Customer Khata</span>
+          </a>
           <button (click)="openQuickModal = true" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
             <span>⚡</span>
             <span>Quick Counter Sale</span>
@@ -92,7 +101,10 @@ import { Product, Customer, SalesInvoice, SalesInvoiceRequest, SalesInvoiceLineR
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Customer / Buyer</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold text-slate-700">Customer / Buyer</label>
+              <a routerLink="/customers" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold hover:underline">+ New Customer</a>
+            </div>
             <select [(ngModel)]="invoiceReq.customerId" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white">
               <option [ngValue]="null">Walk-in Cash Customer</option>
               <option *ngFor="let c of customers" [value]="c.id">{{ c.name }} (Khata: ₹{{ c.balanceOutstanding | number:'1.2-2' }})</option>
@@ -121,7 +133,12 @@ import { Product, Customer, SalesInvoice, SalesInvoiceRequest, SalesInvoiceLineR
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
               <tr>
-                <th class="p-3">Product / Item</th>
+                <th class="p-3">
+                  <div class="flex items-center justify-between">
+                    <span>Product / Item</span>
+                    <a routerLink="/products" class="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold hover:underline">+ Add New SKU</a>
+                  </div>
+                </th>
                 <th class="p-3 w-24">Qty</th>
                 <th class="p-3 w-28">Unit Price (₹)</th>
                 <th class="p-3 w-24">GST %</th>
@@ -361,6 +378,10 @@ export class SalesComponent implements OnInit {
 
   submitInvoice(): void {
     this.submitting = true;
+    const cust = this.customers.find(c => c.id === this.invoiceReq.customerId);
+    this.invoiceReq.customerName = cust ? cust.name : 'Walk-in Cash Customer';
+    this.invoiceReq.customerPhone = cust?.phone || null;
+
     this.apiService.createSalesInvoice(this.invoiceReq).subscribe({
       next: () => {
         this.submitting = false;

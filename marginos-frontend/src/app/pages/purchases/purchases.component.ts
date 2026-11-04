@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Product, Supplier, PurchaseInvoice } from '../../models/types';
 
 @Component({
   selector: 'app-purchases',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
@@ -21,10 +22,20 @@ import { Product, Supplier, PurchaseInvoice } from '../../models/types';
           </p>
         </div>
 
-        <button (click)="showNewBill = !showNewBill" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
-          <span>+</span>
-          <span>{{ showNewBill ? 'Close Form' : 'Record Purchase Bill' }}</span>
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+          <a routerLink="/products" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+            <span>📦</span>
+            <span>Product Catalog</span>
+          </a>
+          <a routerLink="/suppliers" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+            <span>🏭</span>
+            <span>Suppliers</span>
+          </a>
+          <button (click)="showNewBill = !showNewBill" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+            <span>+</span>
+            <span>{{ showNewBill ? 'Close Form' : 'Record Purchase Bill' }}</span>
+          </button>
+        </div>
       </div>
 
       <!-- New Purchase Bill Form -->
@@ -39,7 +50,10 @@ import { Product, Supplier, PurchaseInvoice } from '../../models/types';
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Supplier / Vendor</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold text-slate-700">Supplier / Vendor</label>
+              <a routerLink="/suppliers" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold hover:underline">+ New Supplier</a>
+            </div>
             <select [(ngModel)]="billReq.supplierId" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white">
               <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }} (Outstanding: ₹{{ s.balancePayable | number:'1.2-2' }})</option>
             </select>
@@ -63,7 +77,12 @@ import { Product, Supplier, PurchaseInvoice } from '../../models/types';
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
               <tr>
-                <th class="p-3">Product / Stock Item</th>
+                <th class="p-3">
+                  <div class="flex items-center justify-between">
+                    <span>Product / Stock Item</span>
+                    <a routerLink="/products" class="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold hover:underline">+ New SKU</a>
+                  </div>
+                </th>
                 <th class="p-3 w-28">Quantity</th>
                 <th class="p-3 w-32">Purchase Cost / Unit (₹)</th>
                 <th class="p-3 w-28">GST %</th>
@@ -244,7 +263,9 @@ export class PurchasesComponent implements OnInit {
   onProductSelect(line: any): void {
     const p = this.products.find(item => item.id === line.productId);
     if (p) {
+      line.productName = p.name;
       line.unitPrice = p.costPrice || 0;
+      line.unitCost = p.costPrice || 0;
       line.taxRate = p.taxRate || 5;
     }
     this.recalculateBill();
@@ -266,6 +287,12 @@ export class PurchasesComponent implements OnInit {
 
   submitBill(): void {
     this.submitting = true;
+    const supp = this.suppliers.find(s => s.id === this.billReq.supplierId);
+    this.billReq.supplierName = supp ? supp.name : 'Primary Supplier';
+    if (!this.billReq.billNumber || !this.billReq.billNumber.trim()) {
+      this.billReq.billNumber = `BILL-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+
     this.apiService.createPurchaseInvoice(this.billReq).subscribe({
       next: () => {
         this.submitting = false;

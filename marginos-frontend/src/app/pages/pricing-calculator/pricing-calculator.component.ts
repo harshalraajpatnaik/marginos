@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { PricingCalculationResult } from '../../models/types';
 
 @Component({
   selector: 'app-pricing-calculator',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="space-y-6">
       <!-- Header -->
@@ -22,7 +23,11 @@ import { PricingCalculationResult } from '../../models/types';
           </p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <a routerLink="/products" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+            <span>📦</span>
+            <span>Product Catalog</span>
+          </a>
           <button (click)="mode = 'FROM_MARGIN'" [class.bg-indigo-600]="mode === 'FROM_MARGIN'" [class.text-white]="mode === 'FROM_MARGIN'"
                   class="px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 transition">
             Target Margin %

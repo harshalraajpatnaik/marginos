@@ -167,6 +167,8 @@ export interface Customer {
   name: string;
   phone?: string;
   email?: string;
+  gstin?: string;
+  address?: string;
   creditLimit?: number;
   creditPeriodDays?: number;
   balanceOutstanding: number;
@@ -179,6 +181,7 @@ export interface Supplier {
   phone?: string;
   email?: string;
   gstin?: string;
+  address?: string;
   creditPeriodDays?: number;
   paymentTermsDays?: number;
   balancePayable: number;
@@ -201,14 +204,22 @@ export interface SalesInvoiceLineRequest {
   productName?: string;
   quantity: number;
   unitPrice: number;
+  costPrice?: number;
+  discountPercent?: number;
   taxRate: number;
   lineTotal: number;
 }
 
 export interface SalesInvoiceRequest {
   customerId: string | null;
+  customerName?: string;
+  customerPhone?: string | null;
   invoiceDate: string;
+  dueDate?: string | null;
   paymentMode: string;
+  paidAmount?: number | null;
+  discountAmount?: number;
+  notes?: string | null;
   lines: SalesInvoiceLineRequest[];
 }
 
