@@ -218,6 +218,7 @@ public class PurchaseService {
                 .supplierId(p.getSupplier() != null ? p.getSupplier().getId() : null)
                 .supplierName(p.getSupplierName())
                 .subtotal(p.getSubtotal())
+                .taxableAmount(p.getSubtotal() != null ? p.getSubtotal() : (p.getTotalAmount().subtract(p.getTaxAmount() != null ? p.getTaxAmount() : BigDecimal.ZERO)))
                 .discountAmount(p.getDiscountAmount())
                 .taxAmount(p.getTaxAmount())
                 .totalAmount(p.getTotalAmount())

@@ -204,29 +204,71 @@ export class ApiService {
   }
 
   getAbcAnalysis(): Observable<AbcAnalysisItem[]> {
-    return this.http.get<ApiResponse<AbcAnalysisItem[]>>(this.bizUrl('/inventory/abc-analysis'), {
+    return this.http.get<ApiResponse<any>>(this.bizUrl('/inventory/abc-analysis'), {
       headers: this.getHeaders()
-    }).pipe(map(r => r.data || []));
+    }).pipe(map(r => {
+      const data = r.data;
+      if (!data) return [];
+      if (Array.isArray(data)) return data;
+      const combined = [
+        ...(data.classA || []),
+        ...(data.classB || []),
+        ...(data.classC || [])
+      ];
+      return combined.map((item: any) => ({
+        productId: item.productId,
+        productName: item.name || item.productName,
+        stockValue: item.salesRevenue || item.stockValue || 0,
+        valuePercentage: item.revenueSharePercent || item.valuePercentage || 0,
+        cumulativePercentage: item.cumulativePercent || item.cumulativePercentage || 0,
+        category: item.classification || item.category || 'A'
+      }));
+    }));
   }
 
   getSlowMovingInventory(days = 45): Observable<SlowMovingItem[]> {
-    const params = new HttpParams().set('days', days.toString());
-    return this.http.get<ApiResponse<SlowMovingItem[]>>(this.bizUrl('/inventory/slow-moving'), {
+    const params = new HttpParams().set('thresholdDays', days.toString());
+    return this.http.get<ApiResponse<any[]>>(this.bizUrl('/inventory/slow-moving'), {
       headers: this.getHeaders(),
       params
-    }).pipe(map(r => r.data || []));
+    }).pipe(map(r => {
+      const list = r.data || [];
+      return list.map((item: any) => ({
+        productId: item.productId,
+        productName: item.name || item.productName,
+        currentStock: item.currentStock || 0,
+        costPrice: (item.stockValue && item.currentStock) ? (item.stockValue / item.currentStock) : (item.costPrice || 0),
+        tiedUpCapital: item.stockValue || item.tiedUpCapital || 0,
+        daysWithoutSale: item.daysSinceLastMovement || item.daysWithoutSale || 45,
+        recommendation: item.recommendation
+      }));
+    }));
   }
 
   calculateEoq(productId: string, annualDemand: number, orderingCost: number, holdingCostPercent: number): Observable<EoqResult> {
+    const holdingRate = holdingCostPercent ? holdingCostPercent / 100 : 0.15;
     const params = new HttpParams()
       .set('productId', productId)
       .set('annualDemand', annualDemand.toString())
       .set('orderingCost', orderingCost.toString())
-      .set('holdingCostPercent', holdingCostPercent.toString());
-    return this.http.get<ApiResponse<EoqResult>>(this.bizUrl('/inventory/eoq'), {
+      .set('holdingCostRate', holdingRate.toString());
+    return this.http.get<ApiResponse<any>>(this.bizUrl('/inventory/eoq'), {
       headers: this.getHeaders(),
       params
-    }).pipe(map(r => r.data));
+    }).pipe(map(r => {
+      const d = r.data || {};
+      const eoq = d.economicOrderQuantity || d.optimalBatchSize || 0;
+      const orders = d.optimalOrdersPerYear || d.ordersPerYear || 0;
+      const days = d.orderIntervalDays || (orders > 0 ? Math.round(365 / Number(orders)) : 30);
+      const holdingUnit = d.holdingCostPerUnit || 1;
+      const annualCost = d.totalAnnualCost || Math.round((eoq / 2) * holdingUnit + (Number(orders) * orderingCost));
+      return {
+        optimalBatchSize: Math.round(Number(eoq)),
+        ordersPerYear: Number(orders),
+        orderIntervalDays: days,
+        totalAnnualCost: Number(annualCost)
+      };
+    }));
   }
 
   // Parties (Customers & Suppliers)
@@ -665,7 +707,17 @@ export class ApiService {
     return this.http.get<any>(this.bizUrl('/budgets/annual'), {
       headers: this.getHeaders(),
       params: { year: year.toString() }
-    }).pipe(map(r => r.data?.monthlyBudgets || []));
+    }).pipe(map(r => {
+      const variances = r.data?.monthlyVariances || [];
+      return variances.map((v: any) => ({
+        ...v,
+        category: 'MONTHLY_P_AND_L',
+        month: v.monthNumber,
+        year: v.year,
+        budgetedAmount: v.budgetedRevenue,
+        actualAmount: v.actualRevenue
+      }));
+    }));
   }
 
   createBudget(budget: Partial<Budget>): Observable<Budget> {

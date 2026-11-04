@@ -100,7 +100,7 @@ public class AiService {
 
         String rawQuery = req.getQuestion() != null ? req.getQuestion().trim() : "";
 
-        // 2. If Gemini API key is configured and AI is enabled, attempt upstream LLM reasoning
+        // 2. If Gemini API key is configured or in env, attempt upstream LLM reasoning
         String apiKey = (geminiApiKey != null && !geminiApiKey.isBlank()) ? geminiApiKey : System.getenv("GEMINI_API_KEY");
         if (apiKey != null && !apiKey.isBlank()) {
             try {
@@ -143,6 +143,95 @@ public class AiService {
             UUID businessId) {
 
         String q = query.toLowerCase();
+
+        // 1. MBA Profitability Turnaround Engine (DuPont Framework & Contribution Margin)
+        if (q.contains("profit") && (q.contains("how") || q.contains("become") || q.contains("increase") || q.contains("more") || q.contains("grow") || q.contains("improve") || q.contains("strategy") || q.contains("turnaround"))) {
+            BigDecimal sales = dash.getMonthToDateSales();
+            BigDecimal grossProfit = dash.getMonthToDateGrossProfit();
+            BigDecimal grossMargin = dash.getMonthToDateGrossMarginPercent();
+            BigDecimal expenses = dash.getMonthToDateExpenses();
+            BigDecimal netProfit = dash.getMonthToDateNetProfit();
+            BigDecimal receivables = rec.getTotal();
+            BigDecimal highRisk = rec.getSixtyPlus();
+            BigDecimal stockVal = inv.getTotalStockValue();
+
+            // DuPont Lever 1: 2% Gross Margin Expansion
+            BigDecimal extraProfitFrom2Pct = sales.multiply(new BigDecimal("0.02"));
+            // DuPont Lever 2: Capital release from overdue debtors & dead stock
+            BigDecimal trappedCapital = highRisk.add(stockVal.multiply(new BigDecimal("0.20")));
+
+            return String.format(
+                    "📊 **MBA Business Turnaround Roadmap for %s:**\n\n" +
+                    "### 1. Executive Diagnosis (The Real Numbers)\n" +
+                    "- **Sales (Month-to-Date):** **%s**\n" +
+                    "- **Gross Margin:** **%s%%** (Gross Profit: **%s**)\n" +
+                    "- **Operating Overhead:** **%s** (%s%% of sales)\n" +
+                    "- **Net Profit:** **%s**\n" +
+                    "- **Trapped Working Capital:** **%s** (Overdue Udhaar: **%s**, Dead/Slow Stock: **%s**)\n\n" +
+                    "### 2. Strategic MBA Framework: DuPont Retail Model\n" +
+                    "According to the **DuPont Equation for Retail**, your Return on Capital equals:\n" +
+                    "`Net Profit Margin × Inventory Turnover × Working Capital Velocity`\n\n" +
+                    "To generate explosive profit growth without extra capital, apply these **3 high-impact levers**:\n\n" +
+                    "**Lever 1: Stop Margin Leakage (Target: +2%% Gross Margin Expansion)**\n" +
+                    "- Eliminating informal counter discounts and rounding off losses will immediately add **+%s in pure profit** every month on your current volume.\n" +
+                    "- *Counter Merchandising:* Place 30-40%% high-margin impulse snacks, batteries, and branded accessories right at the billing register.\n\n" +
+                    "**Lever 2: Unlock Trapped Capital & Squeeze the Cash Conversion Cycle**\n" +
+                    "- You have **%s in high-risk customer dues (>60 days)** and **%s tied up in stock**.\n" +
+                    "- Liquidating slow-moving items with a 10%% bundle and collecting past-due udhaar will free up **~%s in fresh cash**.\n" +
+                    "- Reinvest this released capital into high-velocity Category A products that turn over every 7–10 days.\n\n" +
+                    "**Lever 3: Rationalize Operating Overheads**\n" +
+                    "- Your current monthly overhead burden is **%s**.\n" +
+                    "- Benchmark rule: In Indian retail, store rent + wages + electricity should remain strictly **below 10–12%% of revenue**.\n\n" +
+                    "🎯 **Immediate 7-Day Action Plan:**\n" +
+                    "1. Send automated WhatsApp collection reminders for all dues >30 days.\n" +
+                    "2. Mark down the bottom 5 slow-moving SKUs by 15%% to recover tied-up capital.\n" +
+                    "3. Enforce a strict minimum selling price with zero unrecorded counter credit.",
+                    dash.getBusinessName(),
+                    MoneyUtils.formatInr(sales),
+                    grossMargin,
+                    MoneyUtils.formatInr(grossProfit),
+                    MoneyUtils.formatInr(expenses),
+                    sales.compareTo(BigDecimal.ZERO) > 0 ? expenses.multiply(new BigDecimal("100")).divide(sales, 1, RoundingMode.HALF_UP) : "0",
+                    MoneyUtils.formatInr(netProfit),
+                    MoneyUtils.formatInr(trappedCapital),
+                    MoneyUtils.formatInr(highRisk),
+                    MoneyUtils.formatInr(stockVal),
+                    MoneyUtils.formatInr(extraProfitFrom2Pct),
+                    MoneyUtils.formatInr(highRisk),
+                    MoneyUtils.formatInr(stockVal),
+                    MoneyUtils.formatInr(trappedCapital.multiply(new BigDecimal("0.85"))),
+                    MoneyUtils.formatInr(expenses)
+            );
+        }
+
+        // 2. Customer Khata & Collections SOP
+        if (q.contains("udhaar") || q.contains("receivable") || q.contains("debtor") || q.contains("khata") || q.contains("collect") || q.contains("due")) {
+            BigDecimal totalRec = rec.getTotal();
+            BigDecimal highRisk = rec.getSixtyPlus();
+            BigDecimal thirtyToSixty = rec.getThirtyTo60();
+            BigDecimal currentZeroThirty = rec.getCurrent();
+
+            return String.format(
+                    "👥 **Customer Khata & Receivables Recovery SOP (%s):**\n\n" +
+                    "- **Total Outstanding Credit (Udhaar):** **%s**\n" +
+                    "- **Current (0–30 days):** **%s** (Normal retail billing cycle)\n" +
+                    "- **Overdue (31–60 days):** **%s** (Follow-up required)\n" +
+                    "- **High-Risk (>60 days):** **%s** (Immediate capital risk)\n\n" +
+                    "⚠️ **The Cost of Free Credit:**\n" +
+                    "When customers delay payment by 60+ days, you are providing **zero-interest loans funded out of your own store working capital**.\n\n" +
+                    "📋 **MBA 4-Step Credit Recovery Policy:**\n" +
+                    "1. **Automated WhatsApp Reminders:** Send 1-click ledger statements with UPI payment links for the **%s** in overdue dues.\n" +
+                    "2. **Stop-Credit Threshold:** Freeze new credit orders for any account with balances older than 30 days.\n" +
+                    "3. **Early Settlement Incentive:** Offer a 1.5%% prompt-payment discount for settlement within 48 hours.\n" +
+                    "4. **Shift to COD:** Transition chronic late-paying walk-ins strictly to Cash on Delivery / UPI.",
+                    dash.getBusinessName(),
+                    MoneyUtils.formatInr(totalRec),
+                    MoneyUtils.formatInr(currentZeroThirty),
+                    MoneyUtils.formatInr(thirtyToSixty),
+                    MoneyUtils.formatInr(highRisk),
+                    MoneyUtils.formatInr(highRisk.add(thirtyToSixty))
+            );
+        }
 
         // A. Cash vs. Profit Reconciliation
         if (q.contains("cash") && (q.contains("profit") || q.contains("lower") || q.contains("differ") || q.contains("where"))) {
@@ -405,8 +494,22 @@ public class AiService {
                 slowMoving.size()
         );
 
-        String systemPrompt = "You are MarginOS AI, an expert chartered accountant and retail finance strategist for Indian small businesses. " +
-                "You base your answers strictly on the provided store numbers. Never hallucinate numbers. Use clear Markdown, bold currency figures (₹), and actionable bullet points.";
+        String systemPrompt = "You are MarginOS AI, an elite Chief Financial Officer, Chartered Accountant, and Harvard/Wharton/IIM MBA Retail Turnaround Strategist advising Indian shopkeepers, distributors, and retailers.\n\n" +
+                "YOUR CORE METHODOLOGY IS GROUNDED IN TOP MBA FRAMEWORKS:\n" +
+                "1. DuPont Analysis for Retail: Return on Capital = Net Profit Margin × Asset Turnover × Financial Leverage.\n" +
+                "2. Cost-Volume-Profit (CVP) & Contribution Margin: Break-even point, operating leverage, and margin of safety.\n" +
+                "3. Working Capital & Cash Conversion Cycle (CCC): Days Sales Outstanding (DSO) + Days Inventory Outstanding (DIO) - Days Payables Outstanding (DPO).\n" +
+                "4. Pareto 80/20 & ABC Inventory Classification: Class A (top 70% revenue), Class B (20%), Class C (tail 10%). Liquidate slow stock to fund high-velocity SKUs.\n" +
+                "5. Pricing Discipline & Retail Elasticity: Markup vs Margin distinction, stop informal rounding discounts, counter impulse cross-selling (35% margin impulse items alongside 8% margin staples).\n\n" +
+                "CRITICAL INSTRUCTIONS:\n" +
+                "- Ground EVERY claim strictly in the store's authoritative numbers provided. Never hallucinate numbers.\n" +
+                "- Use bold Indian Rupee figures (₹) and Indian number grouping (thousands/lakhs).\n" +
+                "- Answer the user's question directly with empathy, business acumen, and clarity.\n" +
+                "- Structure answers into 4 clear sections:\n" +
+                "  1. 📊 Executive Diagnosis (Current numbers from ledger)\n" +
+                "  2. 🎓 Strategic MBA Framework (DuPont, CCC, CVP, or Pricing Elasticity explained in simple retail terms)\n" +
+                "  3. 🚀 Practical Step-by-Step Action Plan (Exact ₹ recovery targets, reorders, or discount clearances)\n" +
+                "  4. 📈 Projected Financial Outcome (Impact on Net Profit and Free Cash Flow).";
 
         String payload = String.format("""
                 {

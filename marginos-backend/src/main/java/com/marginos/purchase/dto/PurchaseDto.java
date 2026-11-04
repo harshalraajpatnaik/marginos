@@ -70,6 +70,7 @@ public class PurchaseDto {
         private UUID supplierId;
         private String supplierName;
         private BigDecimal subtotal;
+        private BigDecimal taxableAmount;
         private BigDecimal discountAmount;
         private BigDecimal taxAmount;
         private BigDecimal totalAmount;

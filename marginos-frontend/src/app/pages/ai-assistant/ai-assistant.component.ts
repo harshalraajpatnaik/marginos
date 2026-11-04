@@ -79,12 +79,14 @@ interface ChatMessage {
 })
 export class AiAssistantComponent {
   sampleChips = [
+    'How can I become profitable? Give me an MBA turnaround plan.',
     'Why is my cash in hand lower than my net profit this month?',
+    'How do I recover pending customer udhaar dues?',
+    'What are my slow-moving items and how much capital is locked?',
     'Can I afford to hire a staff helper at ₹12,000/month?',
     'Can my business afford a ₹5,00,000 loan at 12% for 3 years?',
-    'What price should I charge for 22% margin on ₹85 cost?',
-    'What are my slow-moving items and how much capital is locked?',
-    'What is my break-even monthly and daily sales target?'
+    'What is my break-even monthly and daily sales target?',
+    'What price should I charge for 22% margin on ₹85 cost?'
   ];
 
   messages: ChatMessage[] = [

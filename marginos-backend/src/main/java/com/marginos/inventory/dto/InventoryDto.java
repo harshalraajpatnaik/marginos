@@ -124,6 +124,10 @@ public class InventoryDto {
         private BigDecimal holdingCostPerUnit;
         private BigDecimal economicOrderQuantity; // Optimal order size
         private BigDecimal optimalOrdersPerYear;
+        private BigDecimal optimalBatchSize;
+        private BigDecimal ordersPerYear;
+        private int orderIntervalDays;
+        private BigDecimal totalAnnualCost;
         private String explanation;
     }
 }

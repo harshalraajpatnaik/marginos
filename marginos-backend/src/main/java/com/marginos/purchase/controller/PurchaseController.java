@@ -38,7 +38,7 @@ public class PurchaseController {
         return ResponseEntity.ok(ApiResponse.ok("Purchase bill recorded", response));
     }
 
-    @GetMapping
+    @GetMapping({"", "/bills", "/invoices"})
     @Operation(summary = "List purchase bills (Paginated)")
     public ResponseEntity<ApiResponse<PageResponse<PurchaseInvoiceResponse>>> getPurchases(
             @AuthenticationPrincipal UserPrincipal principal,

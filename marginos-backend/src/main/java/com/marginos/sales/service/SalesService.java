@@ -273,6 +273,7 @@ public class SalesService {
                 .customerName(inv.getCustomerName())
                 .customerPhone(inv.getCustomerPhone())
                 .subtotal(inv.getSubtotal())
+                .taxableAmount(inv.getSubtotal() != null ? inv.getSubtotal() : (inv.getTotalAmount().subtract(inv.getTaxAmount() != null ? inv.getTaxAmount() : BigDecimal.ZERO)))
                 .discountAmount(inv.getDiscountAmount())
                 .taxAmount(inv.getTaxAmount())
                 .totalAmount(inv.getTotalAmount())

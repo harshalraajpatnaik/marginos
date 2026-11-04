@@ -181,7 +181,7 @@ import { Product, Supplier, PurchaseInvoice } from '../../models/types';
                 <td class="p-3">{{ p.billDate || p.invoiceDate }}</td>
                 <td class="p-3 font-medium">{{ p.supplierName }}</td>
                 <td class="p-3">{{ p.paymentMode }}</td>
-                <td class="p-3 text-right">₹{{ p.taxableAmount | number:'1.2-2' }}</td>
+                <td class="p-3 text-right font-medium">₹{{ (p.taxableAmount || p.subtotal || (p.totalAmount - (p.taxAmount || 0))) | number:'1.2-2' }}</td>
                 <td class="p-3 text-right text-emerald-700">₹{{ p.taxAmount | number:'1.2-2' }}</td>
                 <td class="p-3 text-right font-black text-slate-900">₹{{ p.totalAmount | number:'1.2-2' }}</td>
                 <td class="p-3">
@@ -226,7 +226,13 @@ export class PurchasesComponent implements OnInit {
 
   loadPurchases(): void {
     this.apiService.getPurchaseInvoices().subscribe({
-      next: (list) => this.purchases = list
+      next: (list) => {
+        this.purchases = (list || []).map(p => ({
+          ...p,
+          taxableAmount: p.taxableAmount ?? p.subtotal ?? (p.totalAmount - (p.taxAmount || 0)),
+          taxAmount: p.taxAmount ?? 0
+        }));
+      }
     });
   }
 

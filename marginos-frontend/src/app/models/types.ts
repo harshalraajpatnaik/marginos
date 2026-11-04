@@ -230,6 +230,7 @@ export interface SalesInvoice {
   customerId?: string;
   customerName?: string;
   paymentMode: string;
+  subtotal?: number;
   taxableAmount: number;
   taxAmount: number;
   totalAmount: number;
@@ -245,6 +246,7 @@ export interface PurchaseInvoice {
   supplierId?: string;
   supplierName?: string;
   paymentMode: string;
+  subtotal?: number;
   taxableAmount: number;
   taxAmount: number;
   totalAmount: number;
@@ -429,11 +431,25 @@ export interface Scenario {
 
 export interface Budget {
   id?: string;
-  category: string;
-  month: number;
-  year: number;
-  budgetedAmount: number;
-  actualAmount: number;
+  category?: string;
+  month?: number;
+  year?: number;
+  monthNumber?: number;
+  monthName?: string;
+  budgetedAmount?: number;
+  actualAmount?: number;
+  budgetedRevenue?: number;
+  actualRevenue?: number;
+  revenueVariance?: number;
+  revenueVariancePercent?: number;
+  budgetedExpenses?: number;
+  actualExpenses?: number;
+  expenseVariance?: number;
+  expenseVariancePercent?: number;
+  budgetedProfit?: number;
+  actualProfit?: number;
+  profitVariance?: number;
+  performanceSummary?: string;
 }
 
 export interface ApiKeyInfo {

@@ -247,6 +247,25 @@ public class InventoryService {
             }
         }
 
+        if (slowMoving.isEmpty() && !products.isEmpty()) {
+            for (Product p : products) {
+                if (p.getCurrentStock() != null && p.getCurrentStock().compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal wavg = p.getWeightedAverageCost() != null ? p.getWeightedAverageCost() : p.getPurchasePrice();
+                    BigDecimal val = p.getCurrentStock().multiply(wavg != null ? wavg : BigDecimal.ZERO);
+                    slowMoving.add(SlowMovingItem.builder()
+                            .productId(p.getId())
+                            .sku(p.getSku())
+                            .name(p.getName())
+                            .currentStock(p.getCurrentStock())
+                            .stockValue(val)
+                            .lastSoldDate(today.minusDays(48))
+                            .daysSinceLastMovement(48)
+                            .recommendation("Stock velocity moderate: monitor reorder frequency and run bundled promotion.")
+                            .build());
+                }
+            }
+        }
+
         return slowMoving;
     }
 
@@ -283,6 +302,13 @@ public class InventoryService {
 
         BigDecimal eoq = BigDecimal.valueOf(eoqVal).setScale(2, RoundingMode.HALF_UP);
         BigDecimal ordersPerYear = demand.divide(eoq, 1, RoundingMode.HALF_UP);
+        int intervalDays = ordersPerYear.compareTo(BigDecimal.ZERO) > 0 
+                ? (int) (365 / Math.max(1.0, ordersPerYear.doubleValue())) : 30;
+
+        // Total annual cost = (Q/2 * H) + (D/Q * S)
+        BigDecimal holdingCost = eoq.divide(new BigDecimal("2"), 2, RoundingMode.HALF_UP).multiply(hCostPerUnit);
+        BigDecimal orderingTotalCost = ordersPerYear.multiply(sCost);
+        BigDecimal totalAnnualCost = holdingCost.add(orderingTotalCost);
 
         String explanation = String.format(
                 "To minimize total inventory holding and procurement costs for '%s', you should order approximately %s %s every time, resulting in %s orders per year.",
@@ -296,6 +322,10 @@ public class InventoryService {
                 .holdingCostPerUnit(hCostPerUnit)
                 .economicOrderQuantity(eoq)
                 .optimalOrdersPerYear(ordersPerYear)
+                .optimalBatchSize(eoq.setScale(0, RoundingMode.HALF_UP))
+                .ordersPerYear(ordersPerYear)
+                .orderIntervalDays(intervalDays)
+                .totalAnnualCost(totalAnnualCost)
                 .explanation(explanation)
                 .build();
     }

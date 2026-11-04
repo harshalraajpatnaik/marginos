@@ -82,6 +82,7 @@ public class SalesDto {
         private String customerName;
         private String customerPhone;
         private BigDecimal subtotal;
+        private BigDecimal taxableAmount;
         private BigDecimal discountAmount;
         private BigDecimal taxAmount;
         private BigDecimal totalAmount;

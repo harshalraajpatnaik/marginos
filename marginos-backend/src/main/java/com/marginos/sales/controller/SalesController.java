@@ -49,7 +49,7 @@ public class SalesController {
         return ResponseEntity.ok(ApiResponse.ok("Quick sale recorded", response));
     }
 
-    @GetMapping
+    @GetMapping({"", "/invoices"})
     @Operation(summary = "List sales invoices (Paginated)")
     public ResponseEntity<ApiResponse<PageResponse<SalesInvoiceResponse>>> getInvoices(
             @AuthenticationPrincipal UserPrincipal principal,

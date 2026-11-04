@@ -251,7 +251,7 @@ import { Product, Customer, SalesInvoice, SalesInvoiceRequest, SalesInvoiceLineR
                     {{ inv.paymentMode }}
                   </span>
                 </td>
-                <td class="p-3 text-right">₹{{ inv.taxableAmount | number:'1.2-2' }}</td>
+                <td class="p-3 text-right font-medium">₹{{ (inv.taxableAmount || inv.subtotal || (inv.totalAmount - (inv.taxAmount || 0))) | number:'1.2-2' }}</td>
                 <td class="p-3 text-right">₹{{ inv.taxAmount | number:'1.2-2' }}</td>
                 <td class="p-3 text-right font-black text-slate-900">₹{{ inv.totalAmount | number:'1.2-2' }}</td>
                 <td class="p-3">
@@ -309,7 +309,13 @@ export class SalesComponent implements OnInit {
 
   loadInvoices(): void {
     this.apiService.getSalesInvoices().subscribe({
-      next: (list) => this.invoices = list
+      next: (list) => {
+        this.invoices = (list || []).map(inv => ({
+          ...inv,
+          taxableAmount: inv.taxableAmount ?? inv.subtotal ?? (inv.totalAmount - (inv.taxAmount || 0)),
+          taxAmount: inv.taxAmount ?? 0
+        }));
+      }
     });
   }
 
