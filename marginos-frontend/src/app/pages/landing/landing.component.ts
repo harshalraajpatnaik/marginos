@@ -8,25 +8,25 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <div class="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-500 selection:text-white">
-      <!-- Navbar -->
-      <nav class="border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+      
+      <!-- Top Modern Navbar -->
+      <nav class="border-b border-slate-100 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-800 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-200">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-800 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-100">
               ₹
             </div>
             <div>
               <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-slate-950 via-indigo-950 to-indigo-900 bg-clip-text text-transparent">MarginOS</span>
-              <span class="hidden sm:inline-block ml-2 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Financial OS for India</span>
+              <span class="hidden sm:inline-block ml-2 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">100% Free Forever</span>
             </div>
           </div>
 
           <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-            <a href="#problem" class="hover:text-indigo-600 transition">The Problem</a>
-            <a href="#modes" class="hover:text-indigo-600 transition">Operating Modes</a>
-            <a href="#tools" class="hover:text-indigo-600 transition">MBA Tools</a>
-            <a href="#comparison" class="hover:text-indigo-600 transition">Comparison</a>
-            <a href="#pricing" class="hover:text-indigo-600 transition">Pricing</a>
+            <button (click)="scrollTo('problem')" class="hover:text-indigo-600 transition cursor-pointer">The Problem</button>
+            <button (click)="scrollTo('modes')" class="hover:text-indigo-600 transition cursor-pointer">Operating Modes</button>
+            <button (click)="scrollTo('tools')" class="hover:text-indigo-600 transition cursor-pointer">MBA Decision Tools</button>
+            <button (click)="scrollTo('comparison')" class="hover:text-indigo-600 transition cursor-pointer">Comparison</button>
           </div>
 
           <div class="flex items-center gap-3">
@@ -34,17 +34,17 @@ import { RouterModule } from '@angular/router';
               Sign In
             </a>
             <a routerLink="/login" class="text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-md shadow-indigo-200 transition">
-              Explore Demo →
+              Launch Demo →
             </a>
           </div>
         </div>
       </nav>
 
       <!-- Hero Section -->
-      <section class="relative pt-16 pb-24 overflow-hidden bg-gradient-to-b from-indigo-50/50 via-white to-white">
+      <section class="relative pt-16 pb-24 overflow-hidden bg-gradient-to-b from-indigo-50/60 via-white to-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100/80 text-indigo-800 text-xs font-bold tracking-wide uppercase mb-6 border border-indigo-200">
-            <span>🚀 Built for Kiranas, Retailers & Indian SMEs</span>
+            <span>🚀 Financial Operating System for Indian Retailers, Kiranas & Distributors</span>
           </div>
 
           <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-950 max-w-4xl mx-auto leading-tight">
@@ -53,34 +53,102 @@ import { RouterModule } from '@angular/router';
           </h1>
 
           <p class="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            The first financial operating system combining <strong>double-entry accounting</strong>, <strong>instant shopkeeper daily cashbook</strong>, and <strong>MBA-grade business decision tools</strong>. Designed for Indian business realities.
+            The first financial OS uniting <strong>strict double-entry accounting</strong>, <strong>instant 3-click shopkeeper cashbook</strong>, and <strong>MBA decision-support tools</strong>. Runs out of the box without complex setup.
           </p>
 
           <!-- CTAs -->
           <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a routerLink="/login" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base shadow-xl shadow-indigo-200 hover:shadow-indigo-300 transition-all flex items-center justify-center gap-2">
-              <span>Launch Demo Workspace</span>
+              <span>Launch Demo Store (Gupta Kirana)</span>
               <span>→</span>
             </a>
             <a routerLink="/register" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-base border border-slate-300 shadow-sm transition">
-              Create Free Account
+              Create New Business Account
             </a>
           </div>
 
-          <!-- Feature Badges -->
+          <!-- Trust Badges -->
           <div class="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-slate-500">
             <div class="flex items-center gap-2">
-              <span class="text-emerald-500 font-bold">✓</span> No Bank Integration Required
+              <span class="text-emerald-500 font-bold">✓</span> No Bank Logins or Integrations Needed
             </div>
             <div class="flex items-center gap-2">
               <span class="text-emerald-500 font-bold">✓</span> 3-Click Daily Cash Closing
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-emerald-500 font-bold">✓</span> 1-Click WhatsApp Summary
+              <span class="text-emerald-500 font-bold">✓</span> 1-Click WhatsApp Daily Digest
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-emerald-500 font-bold">✓</span> Strict Double-Entry Engine
+              <span class="text-emerald-500 font-bold">✓</span> Balanced Double-Entry PostgreSQL Engine
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- The Problem Section (Fixes user feedback: #problem now fully active) -->
+      <section id="problem" class="py-20 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute -left-20 top-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -right-20 bottom-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="text-center max-w-3xl mx-auto mb-16">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800">
+              The Reality of Indian Retail
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-black text-white mt-4 tracking-tight">
+              Why Traditional Software Fails Indian Shopkeepers
+            </h2>
+            <p class="mt-4 text-slate-300 text-base leading-relaxed">
+              Most Indian shopkeepers don't have accountants, full barcode scanners, or bank API feeds. Legacy tools force complex bookkeeping from day one, causing 80% of small retailers to abandon them.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Trap 1 -->
+            <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 shadow-lg hover:border-indigo-500 transition">
+              <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-2xl font-bold mb-4">
+                ⚠️
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">The Markup vs Margin Trap</h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Adding 25% markup on a ₹100 item sells for ₹125. That's only a <strong>20% margin</strong>. If shop rent and bills are 22%, the owner loses 2% on every sale while assuming they made 25%.
+              </p>
+            </div>
+
+            <!-- Trap 2 -->
+            <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 shadow-lg hover:border-indigo-500 transition">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl font-bold mb-4">
+                📉
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Cash vs. Profit Confusion</h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Having cash in the drawer doesn't mean you made profit; it often represents supplier dues payable next Monday. Conversely, a profitable month can cause insolvency if profit is trapped in customer Udhaar.
+              </p>
+            </div>
+
+            <!-- Trap 3 -->
+            <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 shadow-lg hover:border-indigo-500 transition">
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl font-bold mb-4">
+                ⛓️
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">The Udhaar & Working Capital Lock</h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Customers buy on credit, while suppliers demand cash or short credit terms. Without automated cash conversion cycle tracking (DIO, DSO, DPO), businesses bleed out without knowing why.
+              </p>
+            </div>
+
+            <!-- Trap 4 -->
+            <div class="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 shadow-lg hover:border-indigo-500 transition">
+              <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl font-bold mb-4">
+                🛑
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">The 60-Minute Bookkeeping Wall</h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Shopkeepers work 14 hours a day on their feet. They cannot spend an hour entering journal vouchers in Tally. They need a <strong>60-second end-of-day cash reconciliation</strong> that updates the ledger automatically.
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
@@ -320,4 +388,11 @@ import { RouterModule } from '@angular/router';
     </div>
   `
 })
-export class LandingComponent {}
+export class LandingComponent {
+  scrollTo(elementId: string): void {
+    const el = document.getElementById(elementId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+}

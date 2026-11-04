@@ -167,9 +167,10 @@ export interface Customer {
   name: string;
   phone?: string;
   email?: string;
-  creditLimit: number;
-  creditPeriodDays: number;
+  creditLimit?: number;
+  creditPeriodDays?: number;
   balanceOutstanding: number;
+  currentBalance?: number;
 }
 
 export interface Supplier {
@@ -178,8 +179,10 @@ export interface Supplier {
   phone?: string;
   email?: string;
   gstin?: string;
-  creditPeriodDays: number;
+  creditPeriodDays?: number;
+  paymentTermsDays?: number;
   balancePayable: number;
+  currentBalance?: number;
 }
 
 export interface KhataSummary {
@@ -295,8 +298,8 @@ export interface TrialBalance {
 }
 
 export interface ProfitLossStatement {
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
   operatingRevenue: number;
   cogs: number;
   grossProfit: number;
@@ -336,14 +339,15 @@ export interface CashFlowStatement {
 }
 
 export interface PricingCalculationResult {
-  costPrice: number;
+  costPrice?: number;
   sellingPrice: number;
-  taxRate: number;
-  taxAmount: number;
+  taxRate?: number;
+  taxAmount?: number;
   finalPriceWithTax: number;
   profitAmount: number;
   grossMarginPercent: number;
   markupPercent: number;
+  plainLanguageExplanation?: string;
 }
 
 export interface BreakevenResult {
@@ -377,21 +381,28 @@ export interface LoanAmortizationEntry {
 }
 
 export interface LoanAmortizationSchedule {
-  principal: number;
-  annualInterestRate: number;
-  tenureMonths: number;
+  principal?: number;
+  annualInterestRate?: number;
+  tenureMonths?: number;
   monthlyEmi: number;
   totalInterest: number;
-  totalAmount: number;
-  entries: LoanAmortizationEntry[];
+  totalAmount?: number;
+  entries?: LoanAmortizationEntry[];
+  debtServiceCoverageRatio?: number;
+  affordabilityStatus?: string;
+  recommendation?: string;
 }
 
 export interface DscrAnalysis {
-  dscrRatio: number;
-  annualOperatingProfit: number;
-  annualDebtService: number;
+  dscrRatio?: number;
+  annualOperatingProfit?: number;
+  annualDebtService?: number;
   verdict: string;
   explanation: string;
+  monthlyEmi?: number;
+  monthlyOperatingProfit?: number;
+  dscr?: number;
+  status?: string;
 }
 
 export interface Scenario {
