@@ -170,9 +170,19 @@ export class ExpensesComponent implements OnInit {
   submitExpense(): void {
     this.submitting = true;
     this.apiService.createExpense(this.expenseReq).subscribe({
-      next: () => {
+      next: (created: any) => {
         this.submitting = false;
         this.showNewExpense = false;
+        const newExp: Expense = {
+          id: created?.id || 'exp-' + Date.now(),
+          expenseDate: this.expenseReq.expenseDate,
+          category: this.expenseReq.category,
+          amount: Number(this.expenseReq.amount) || 0,
+          description: this.expenseReq.description || this.expenseReq.category,
+          paymentMode: this.expenseReq.paymentMode,
+          payeeName: this.expenseReq.payeeName || this.expenseReq.vendorName
+        };
+        this.expenses = [newExp, ...this.expenses];
         this.loadExpenses();
         this.expenseReq.amount = null;
         this.expenseReq.description = '';

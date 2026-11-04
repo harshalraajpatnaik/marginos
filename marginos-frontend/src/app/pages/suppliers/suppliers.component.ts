@@ -180,9 +180,18 @@ export class SuppliersComponent implements OnInit {
   saveSupplier(): void {
     this.saving = true;
     this.apiService.createSupplier(this.newSupp).subscribe({
-      next: () => {
+      next: (created: any) => {
         this.saving = false;
         this.showAddModal = false;
+        const s: Supplier = {
+          id: created?.id || 'supp-' + Date.now(),
+          name: this.newSupp.name || 'New Supplier',
+          phone: this.newSupp.phone || '',
+          gstin: this.newSupp.gstin || '',
+          creditPeriodDays: Number(this.newSupp.creditPeriodDays) || 30,
+          balancePayable: created?.currentBalance ?? created?.balancePayable ?? 0
+        };
+        this.suppliers = [s, ...this.suppliers];
         this.loadSuppliers();
         this.newSupp = { name: '', phone: '', gstin: '', creditPeriodDays: 30 };
       },

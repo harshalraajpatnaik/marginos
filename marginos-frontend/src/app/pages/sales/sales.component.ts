@@ -383,9 +383,21 @@ export class SalesComponent implements OnInit {
     this.invoiceReq.customerPhone = cust?.phone || null;
 
     this.apiService.createSalesInvoice(this.invoiceReq).subscribe({
-      next: () => {
+      next: (created: any) => {
         this.submitting = false;
         this.showNewInvoice = false;
+        const newInv: SalesInvoice = {
+          id: created?.id || 'inv-' + Date.now(),
+          invoiceNumber: created?.invoiceNumber || 'INV-' + Date.now().toString().slice(-4),
+          invoiceDate: this.invoiceReq.invoiceDate,
+          customerName: this.invoiceReq.customerName,
+          paymentMode: this.invoiceReq.paymentMode,
+          taxableAmount: this.grandTotal * 0.95,
+          taxAmount: this.grandTotal * 0.05,
+          totalAmount: created?.totalAmount || this.grandTotal,
+          paymentStatus: this.invoiceReq.paymentMode === 'CREDIT' ? 'UNPAID' : 'PAID'
+        };
+        this.invoices = [newInv, ...this.invoices];
         this.loadInvoices();
         this.invoiceReq.lines = [];
         this.addLine();
@@ -399,15 +411,28 @@ export class SalesComponent implements OnInit {
   submitQuickSale(): void {
     if (!this.quickAmount) return;
     this.quickLoading = true;
+    const amount = this.quickAmount;
     this.apiService.quickCounterSale({
-      totalAmount: this.quickAmount,
+      totalAmount: amount,
       paymentMode: this.quickPaymentMode,
       notes: this.quickNotes
     }).subscribe({
-      next: () => {
+      next: (created: any) => {
         this.quickLoading = false;
         this.openQuickModal = false;
         this.quickAmount = null;
+        const newInv: SalesInvoice = {
+          id: created?.id || 'quick-' + Date.now(),
+          invoiceNumber: created?.invoiceNumber || 'POS-' + Date.now().toString().slice(-4),
+          invoiceDate: new Date().toISOString().split('T')[0],
+          customerName: 'Walk-in Cash Customer',
+          paymentMode: this.quickPaymentMode,
+          taxableAmount: amount,
+          taxAmount: 0,
+          totalAmount: amount,
+          paymentStatus: 'PAID'
+        };
+        this.invoices = [newInv, ...this.invoices];
         this.loadInvoices();
       },
       error: () => {

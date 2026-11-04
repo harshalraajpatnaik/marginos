@@ -176,6 +176,15 @@ export class ApiKeysComponent implements OnInit {
         this.creating = false;
         this.showCreateModal = false;
         this.createdKeyResult = res;
+        const newK: ApiKeyInfo = {
+          id: res.id,
+          name: res.name,
+          maskedToken: res.maskedToken,
+          role: res.role,
+          active: true,
+          createdAt: new Date().toISOString()
+        };
+        this.keysList = [newK, ...this.keysList];
         this.keyName = '';
         this.loadKeys();
       },

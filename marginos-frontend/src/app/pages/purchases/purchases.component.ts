@@ -294,9 +294,21 @@ export class PurchasesComponent implements OnInit {
     }
 
     this.apiService.createPurchaseInvoice(this.billReq).subscribe({
-      next: () => {
+      next: (created: any) => {
         this.submitting = false;
         this.showNewBill = false;
+        const newBill: PurchaseInvoice = {
+          id: created?.id || 'bill-' + Date.now(),
+          billNumber: this.billReq.billNumber,
+          billDate: this.billReq.billDate,
+          supplierName: this.billReq.supplierName,
+          paymentMode: this.billReq.paymentMode,
+          taxableAmount: this.grandTotal * 0.95,
+          taxAmount: this.grandTotal * 0.05,
+          totalAmount: created?.totalAmount || this.grandTotal,
+          paymentStatus: this.billReq.paymentMode === 'CREDIT' ? 'UNPAID' : 'PAID'
+        };
+        this.purchases = [newBill, ...this.purchases];
         this.loadPurchases();
         this.billReq.lines = [];
         this.addLine();

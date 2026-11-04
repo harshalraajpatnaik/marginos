@@ -14,6 +14,7 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+    validate-on-migrate: false
     locations: classpath:db/migration
 
 server:
@@ -30,10 +31,12 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:4200}
   ai:
     enabled: ${AI_ENABLED:false}
-    provider: ${AI_PROVIDER:lm-studio}
+    provider: ${AI_PROVIDER:gemini}
     base-url: ${AI_BASE_URL:http://localhost:1234/v1}
     model: ${AI_MODEL:local-model}
     timeout-seconds: ${AI_TIMEOUT_SECONDS:30}
+    gemini-api-key: ${GEMINI_API_KEY:}
+    gemini-model: ${GEMINI_MODEL:gemini-2.5-flash}
 
 springdoc:
   api-docs:

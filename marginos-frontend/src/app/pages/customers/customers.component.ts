@@ -188,9 +188,18 @@ export class CustomersComponent implements OnInit {
   saveCustomer(): void {
     this.saving = true;
     this.apiService.createCustomer(this.newCust).subscribe({
-      next: () => {
+      next: (created: any) => {
         this.saving = false;
         this.showAddModal = false;
+        const c: Customer = {
+          id: created?.id || 'cust-' + Date.now(),
+          name: this.newCust.name || 'New Customer',
+          phone: this.newCust.phone || '',
+          creditLimit: Number(this.newCust.creditLimit) || 10000,
+          creditPeriodDays: Number(this.newCust.creditPeriodDays) || 30,
+          balanceOutstanding: created?.currentBalance ?? created?.balanceOutstanding ?? 0
+        };
+        this.customers = [c, ...this.customers];
         this.loadCustomers();
         this.newCust = { name: '', phone: '', creditLimit: 10000, creditPeriodDays: 30 };
       },

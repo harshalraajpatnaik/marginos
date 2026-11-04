@@ -80,9 +80,11 @@ interface ChatMessage {
 export class AiAssistantComponent {
   sampleChips = [
     'Why is my cash in hand lower than my net profit this month?',
-    'What are my top 3 slow-moving items and how much capital is locked?',
-    'What price should I charge for 22% net profit margin on ₹85 cost?',
-    'Can my business afford a ₹5,00,000 loan at 12% interest for 3 years?'
+    'Can I afford to hire a staff helper at ₹12,000/month?',
+    'Can my business afford a ₹5,00,000 loan at 12% for 3 years?',
+    'What price should I charge for 22% margin on ₹85 cost?',
+    'What are my slow-moving items and how much capital is locked?',
+    'What is my break-even monthly and daily sales target?'
   ];
 
   messages: ChatMessage[] = [

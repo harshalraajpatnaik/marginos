@@ -78,7 +78,7 @@ import { AuthService } from '../../services/auth.service';
           <div class="mt-6 pt-6 border-t border-slate-100 text-center">
             <p class="text-[11px] text-slate-400">
               Demo Credentials: <br>
-              <code class="text-slate-600 font-mono">harshal&#64;marginos.internal</code> / <code class="text-slate-600 font-mono">Admin&#64;123456</code>
+              <code class="text-slate-600 font-mono">harshal&#64;marginos.internal</code> / <code class="text-slate-600 font-mono">MarginOS&#64;123</code>
             </p>
           </div>
         </div>

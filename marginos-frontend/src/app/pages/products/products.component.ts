@@ -52,6 +52,10 @@ import { Product, Category } from '../../models/types';
             <button (click)="showModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
           </div>
 
+          <div *ngIf="modalError" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+            ⚠️ {{ modalError }}
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Product Name</label>
@@ -205,6 +209,7 @@ export class ProductsComponent implements OnInit {
 
   showModal = false;
   saving = false;
+  modalError = '';
   editingProduct: Product | null = null;
   previewMargin = 0;
 
@@ -229,7 +234,11 @@ export class ProductsComponent implements OnInit {
 
   loadProducts(): void {
     this.apiService.getProducts().subscribe({
-      next: (list) => this.products = list
+      next: (list) => {
+        if (list && list.length > 0) {
+          this.products = list;
+        }
+      }
     });
   }
 
@@ -267,6 +276,7 @@ export class ProductsComponent implements OnInit {
 
   openAddProduct(): void {
     this.editingProduct = null;
+    this.modalError = '';
     this.formProduct = {
       name: '',
       sku: '',
@@ -284,6 +294,7 @@ export class ProductsComponent implements OnInit {
 
   openEditProduct(p: Product): void {
     this.editingProduct = p;
+    this.modalError = '';
     this.formProduct = { ...p };
     this.calcMargin();
     this.showModal = true;
@@ -291,23 +302,46 @@ export class ProductsComponent implements OnInit {
 
   saveProduct(): void {
     this.saving = true;
+    this.modalError = '';
     if (this.editingProduct && this.editingProduct.id) {
-      this.apiService.updateProduct(this.editingProduct.id, this.formProduct).subscribe({
+      const prodId = this.editingProduct.id;
+      this.apiService.updateProduct(prodId, this.formProduct).subscribe({
         next: () => {
           this.saving = false;
           this.showModal = false;
+          this.products = this.products.map(p => p.id === prodId ? { ...p, ...this.formProduct, id: prodId } as Product : p);
           this.loadProducts();
         },
-        error: () => this.saving = false
+        error: (err) => {
+          this.saving = false;
+          this.modalError = err.error?.message || 'Failed to update product.';
+        }
       });
     } else {
       this.apiService.createProduct(this.formProduct).subscribe({
-        next: () => {
+        next: (saved: any) => {
           this.saving = false;
           this.showModal = false;
+          const newP: Product = {
+            id: saved?.id || 'prod-' + Date.now(),
+            name: this.formProduct.name || 'New Product',
+            sku: saved?.sku || this.formProduct.sku || 'SKU-' + Date.now().toString().slice(-4),
+            barcode: this.formProduct.barcode || '',
+            unitOfMeasure: this.formProduct.unitOfMeasure || 'PCS',
+            costPrice: Number(this.formProduct.costPrice) || 0,
+            sellingPrice: Number(this.formProduct.sellingPrice) || 0,
+            currentStock: Number(this.formProduct.currentStock) || 0,
+            reorderPoint: Number(this.formProduct.reorderPoint) || 10,
+            taxRate: Number(this.formProduct.taxRate) || 0,
+            active: true
+          };
+          this.products = [newP, ...this.products];
           this.loadProducts();
         },
-        error: () => this.saving = false
+        error: (err) => {
+          this.saving = false;
+          this.modalError = err.error?.message || 'Failed to create product. Check product name and prices.';
+        }
       });
     }
   }
