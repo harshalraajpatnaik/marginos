@@ -62,22 +62,33 @@ public class DashboardService {
         BigDecimal totalCash = cashInHand.add(bankBalance);
 
         // 2. Today's Sales
-        BigDecimal todaySales = salesInvoiceRepository.sumDailySales(businessId, today);
-        if (todaySales == null) {
-            todaySales = latestCashbook.map(c -> c.getCashSales().add(c.getDigitalSales()).add(c.getCreditSales()))
-                    .orElse(BigDecimal.ZERO);
+        BigDecimal todayInvoiceSales = salesInvoiceRepository.sumDailySales(businessId, today);
+        if (todayInvoiceSales == null) todayInvoiceSales = BigDecimal.ZERO;
+
+        BigDecimal todayCashbookSales = cashbookEntryRepository.findByBusinessIdAndEntryDate(businessId, today)
+                .map(c -> c.getCashSales().add(c.getDigitalSales()).add(c.getCreditSales()))
+                .orElse(BigDecimal.ZERO);
+
+        BigDecimal todaySales = todayCashbookSales.add(todayInvoiceSales);
+        if (todaySales.compareTo(BigDecimal.ZERO) == 0 && latestCashbook.isPresent() && today.equals(latestCashbook.get().getEntryDate())) {
+            todaySales = latestCashbook.get().getCashSales().add(latestCashbook.get().getDigitalSales()).add(latestCashbook.get().getCreditSales());
         }
 
         // 3. Month to Date Sales & Expenses
         BigDecimal invoiceSales = salesInvoiceRepository.sumRangeSales(businessId, startOfMonth, today);
-        BigDecimal cashbookSales = latestCashbook.map(c -> c.getCashSales().add(c.getDigitalSales()).add(c.getCreditSales()))
-                .orElse(BigDecimal.ZERO);
-        BigDecimal ledgerSales = accountRepository.findByBusinessIdAndCode(businessId, "4000")
-                .map(Account::getCurrentBalance).orElse(BigDecimal.ZERO);
+        if (invoiceSales == null) invoiceSales = BigDecimal.ZERO;
 
-        BigDecimal mtdSales = (invoiceSales != null && invoiceSales.compareTo(BigDecimal.ZERO) > 0)
-                ? invoiceSales
-                : (cashbookSales.compareTo(BigDecimal.ZERO) > 0 ? cashbookSales : ledgerSales);
+        List<CashbookEntry> monthCashbooks = cashbookEntryRepository
+                .findByBusinessIdAndEntryDateBetweenOrderByEntryDateAsc(businessId, startOfMonth, today);
+        BigDecimal cashbookMtdSales = monthCashbooks.stream()
+                .map(c -> c.getCashSales().add(c.getDigitalSales()).add(c.getCreditSales()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal mtdSales = cashbookMtdSales.add(invoiceSales);
+        if (mtdSales.compareTo(BigDecimal.ZERO) == 0) {
+            mtdSales = accountRepository.findByBusinessIdAndCode(businessId, "4000")
+                    .map(Account::getCurrentBalance).orElse(BigDecimal.ZERO);
+        }
 
         BigDecimal mtdExpenses = expenseRepository.sumExpensesBetween(businessId, startOfMonth, today);
         if (mtdExpenses == null || mtdExpenses.compareTo(BigDecimal.ZERO) == 0) {
@@ -126,13 +137,14 @@ public class DashboardService {
         List<SalesTrendItem> trend = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
             LocalDate d = today.minusDays(i);
-            BigDecimal daySales = salesInvoiceRepository.sumDailySales(businessId, d);
-            if (daySales == null) {
-                daySales = cashbookEntryRepository.findByBusinessIdAndEntryDate(businessId, d)
-                        .map(c -> c.getCashSales().add(c.getDigitalSales()).add(c.getCreditSales()))
-                        .orElse(BigDecimal.ZERO);
-            }
-            trend.add(new SalesTrendItem(d, daySales));
+            BigDecimal dayInv = salesInvoiceRepository.sumDailySales(businessId, d);
+            if (dayInv == null) dayInv = BigDecimal.ZERO;
+
+            BigDecimal dayCb = cashbookEntryRepository.findByBusinessIdAndEntryDate(businessId, d)
+                    .map(c -> c.getCashSales().add(c.getDigitalSales()).add(c.getCreditSales()))
+                    .orElse(BigDecimal.ZERO);
+
+            trend.add(new SalesTrendItem(d, dayInv.add(dayCb)));
         }
 
         // 7. Top Expenses
